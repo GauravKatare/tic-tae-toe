@@ -6,15 +6,15 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Tictaetoe {
-    private static List<Game> games= new ArrayList<Game>();
+public class Tictaetoe implements Runnable{
+    private List<Game> games= new ArrayList<Game>();
     private int currturn,winner,nsize;
     private Player player[];
     private char[][] matrix = new char [3][3];
     BufferedReader br;
 
     Tictaetoe(){
-        this.player=new Player[2];
+        this.player=new Player[3];
         this.matrix=new char [3][3];
     }
 
@@ -25,6 +25,7 @@ public class Tictaetoe {
             for(int j=0;j<=2;j++)
                 this.matrix[i][j]='_';
         }
+        System.out.println("Enter -1 for reset the game");
         System.out.println("Who wants to play first?");
         System.out.println("Press 0 for "+this.player[0].getName());
         System.out.println("Press 1 for "+this.player[1].getName());
@@ -39,42 +40,97 @@ public class Tictaetoe {
     private void error(){
         System.out.println("wrong move");
     }
-    public static void main(String[] args) throws IOException {
+    public void run(){
         BufferedReader reader =new BufferedReader(new InputStreamReader(System.in));
         Tictaetoe tictaetoe=new Tictaetoe();
-        System.out.println("Enter your name of Player 1 ");
-        String name = reader.readLine();
-        tictaetoe.player[0]=new Player(name);
-        System.out.println("Enter your name of Player 1 ");
-        name = reader.readLine();
-        tictaetoe.player[1]=new Player(name);
+        String name1="player1",name2="player2";
+        try {
+            System.out.println("Enter your name of Player 1 ");
+            name1 = reader.readLine();
+            System.out.println("Enter your name of Player 2 ");
+            name2 = reader.readLine();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        tictaetoe.player[0]=new Player(name1);
+        tictaetoe.player[1]=new Player(name2);
+        tictaetoe.player[2]=new Player("Draw");
         System.out.println("Enter size of matrix");
-        tictaetoe.nsize=Integer.parseInt(reader.readLine());
+        try {
+            tictaetoe.nsize=Integer.parseInt(reader.readLine());
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         tictaetoe.reset();
         while(true){
             while(tictaetoe.currturn==-1){
-                tictaetoe.currturn=Integer.parseInt(reader.readLine());
+                try {
+                    tictaetoe.currturn=Integer.parseInt(reader.readLine());
+                } catch (NumberFormatException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 if(tictaetoe.currturn!=0&&tictaetoe.currturn!=1){
                     System.out.println("Sorry wrong input");
                 }
             }
             tictaetoe.display();
-            int x=-1;
+            int x=-2;
             System.out.println("Enter x:");
-            x = Integer.parseInt(reader.readLine());
+            try {
+                x = Integer.parseInt(reader.readLine());
+            } catch (NumberFormatException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if(x==-1){
+                tictaetoe.reset();
+                continue;
+            }
             int y=-1;
             System.out.println("Enter y:");
-            y = Integer.parseInt(reader.readLine());
+            try {
+                y = Integer.parseInt(reader.readLine());
+            } catch (NumberFormatException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             if(tictaetoe.move(x,y)==1)
                 tictaetoe.currturn=(tictaetoe.currturn+1)%2;
             if(tictaetoe.checkwinner(tictaetoe.nsize)==1){
-                tictaetoe.winner=tictaetoe.currturn;
+                if(tictaetoe.winner==-1)
+                    tictaetoe.winner=2;
                 Game game=new Game(tictaetoe.winner,tictaetoe.nsize,tictaetoe.player);
                 games.add(game);
-                System.out.println(tictaetoe.player[tictaetoe.currturn].getName()+"is winner");
+                if(tictaetoe.winner!=2)
+                    System.out.println(tictaetoe.player[tictaetoe.winner].getName()+"is winner");
+                else
+                    System.out.println("Its a Draw"+tictaetoe.player[tictaetoe.winner].getName());
                 System.out.println("Enter 1 for play again");
                 int a=-1;
-                a = Integer.parseInt(reader.readLine());
+                try {
+                    a = Integer.parseInt(reader.readLine());
+                } catch (NumberFormatException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
                 if(a==1){
                     tictaetoe.reset();
                     continue;
@@ -84,7 +140,8 @@ public class Tictaetoe {
                     Player[] player=iterator.getPlayer();
                     System.out.println("Player 1: "+player[0].getName());
                     System.out.println("Player 2: "+player[1].getName());
-                    System.out.println(iterator.getNsize()+" "+player[iterator.getWinner()].getName());
+                    System.out.println(iterator.getNsize());
+                    System.out.println(iterator.getWinner());
                 }
                 break;
             }    
@@ -115,8 +172,10 @@ public class Tictaetoe {
                 else if(this.matrix[i][j]=='O')
                     cnt--;    
             }
-            if(cnt==n||cnt==-1*n)
+            if(cnt==n||cnt==-1*n){
+                this.winner=1-this.currturn;
                 return 1;
+            }    
         }  
         // Verical Column
         for(int i=0;i<n;i++){
@@ -124,14 +183,16 @@ public class Tictaetoe {
             for(int j=0;j<n;j++){
                 if(this.matrix[j][i]=='*')
                     cnt++;
-                else if(this.matrix[i][j]=='O')
+                else if(this.matrix[j][i]=='O')
                     cnt--;    
             }
-            if(cnt==n||cnt==-1*n)
+            if(cnt==n||cnt==-1*n){
+                this.winner=1-this.currturn;
                 return 1;
+            }    
         }
         // two diagonal
-        int diagonal1=0,diagonal2=0;
+        int diagonal1=0,diagonal2=0,unfilledcell=0;
         for(int i=0;i<n;i++){
             if(this.matrix[i][i]=='*') {
                 diagonal1++;
@@ -144,7 +205,17 @@ public class Tictaetoe {
                 diagonal2--;
             }    
         }    
-        if(diagonal1==n||diagonal1==-1*n||diagonal2==n||diagonal2==-1*n)
+        if(diagonal1==n||diagonal1==-1*n||diagonal2==n||diagonal2==-1*n){
+            this.winner=1-this.currturn;
+            return 1;
+        }    
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(this.matrix[i][j]!='_')
+                    unfilledcell++;
+            }
+        }
+        if(unfilledcell==n*n)
             return 1;
         return 0;
     }

@@ -19,8 +19,14 @@ public class Game {
     public void setNsize(int nsize) {
         this.nsize = nsize;
     }
-    public int getWinner() {
-        return winner;
+    public String getWinner() {
+        String result="Result : ";
+        if(winner==2)
+            result+="It was Draw";
+        else{
+            result+=player[winner].getName()+" is winner";   
+        }
+        return result;
     }
     public void setWinner(int winner) {
         this.winner = winner;

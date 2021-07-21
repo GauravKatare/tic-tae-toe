@@ -111,7 +111,7 @@ public class Tictaetoe implements Runnable{
             }
             if(tictaetoe.move(x,y)==1)
                 tictaetoe.currturn=(tictaetoe.currturn+1)%2;
-            if(tictaetoe.checkwinner(tictaetoe.nsize)==1){
+            if(tictaetoe.(tictaetoe.nsize)==1){
                 if(tictaetoe.winner==-1)
                     tictaetoe.winner=2;
                 Game game=new Game(tictaetoe.winner,tictaetoe.nsize,tictaetoe.player);
@@ -160,63 +160,5 @@ public class Tictaetoe implements Runnable{
             this.matrix[x][y]='*';
         }
         return 1;
-    }
-
-    private int checkwinner(int n){
-        // Horizontal Row
-        for(int i=0;i<n;i++){
-            int cnt=0;
-            for(int j=0;j<n;j++){
-                if(this.matrix[i][j]=='*')
-                    cnt++;
-                else if(this.matrix[i][j]=='O')
-                    cnt--;    
-            }
-            if(cnt==n||cnt==-1*n){
-                this.winner=1-this.currturn;
-                return 1;
-            }    
-        }  
-        // Verical Column
-        for(int i=0;i<n;i++){
-            int cnt=0;
-            for(int j=0;j<n;j++){
-                if(this.matrix[j][i]=='*')
-                    cnt++;
-                else if(this.matrix[j][i]=='O')
-                    cnt--;    
-            }
-            if(cnt==n||cnt==-1*n){
-                this.winner=1-this.currturn;
-                return 1;
-            }    
-        }
-        // two diagonal
-        int diagonal1=0,diagonal2=0,unfilledcell=0;
-        for(int i=0;i<n;i++){
-            if(this.matrix[i][i]=='*') {
-                diagonal1++;
-            } else if(this.matrix[i][i]=='O') {
-                diagonal1--;
-            } 
-            if(this.matrix[i][n-1-i]=='*'){
-                diagonal2++;
-            }else if(this.matrix[i][n-1-i]=='O'){
-                diagonal2--;
-            }    
-        }    
-        if(diagonal1==n||diagonal1==-1*n||diagonal2==n||diagonal2==-1*n){
-            this.winner=1-this.currturn;
-            return 1;
-        }    
-        for(int i=0;i<n;i++){
-            for(int j=0;j<n;j++){
-                if(this.matrix[i][j]!='_')
-                    unfilledcell++;
-            }
-        }
-        if(unfilledcell==n*n)
-            return 1;
-        return 0;
     }
 }
